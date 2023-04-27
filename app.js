@@ -19,44 +19,35 @@ recordButton.addEventListener('click', () => {
       });
 
       mediaRecorder.addEventListener('stop', () => {
-  const audioBlob = new Blob(recordedChunks, { type: 'audio/webm' });
-  const audioURL = URL.createObjectURL(audioBlob);
-  audioPlayer.src = audioURL;
+        const audioBlob = new Blob(recordedChunks, { type: 'audio/webm' });
+        const audioURL = URL.createObjectURL(audioBlob);
+        audioPlayer.src = audioURL;
 
-  const audioContext = new AudioContext();
-  fetch(audioURL)
-    .then(response => response.arrayBuffer())
-    .then(data => audioContext.decodeAudioData(data))
-    .then(audioBuffer => {
-      const wavBlob = convertToWav(audioBuffer);
-      const wavURL = URL.createObjectURL(wavBlob);
-      downloadButton.href = wavURL;
-      downloadButton.download = `audio-${new Date().toISOString()}.wav`;
-    });
+        const audioContext = new AudioContext();
+        fetch(audioURL)
+          .then(response => response.arrayBuffer())
+          .then(data => audioContext.decodeAudioData(data))
+          .then(audioBuffer => {
+            const wavBlob = convertToWav(audioBuffer);
+            const wavURL = URL.createObjectURL(wavBlob);
+            downloadButton.href = wavURL;
+            downloadButton.download = `audio-${new Date().toISOString()}.wav`;
+          });
 
-  recordedChunks = [];
-  downloadButton.disabled = false;
-});
+        recordedChunks = [];
+        downloadButton.disabled = false;
+      });
     })
     .catch(error => {
       console.error('Error accessing audio:', error);
     });
 });
 
-
-
-downloadButton.addEventListener('click', () => {
-  // The download link is already set in the 'stop' event listener, so we don't need to do anything here.
-});
-
-
-
 stopButton.addEventListener('click', () => {
   mediaRecorder.stop();
   recordButton.disabled = false;
   stopButton.disabled = true;
 });
-
 
 function convertToWav(audioBuffer) {
   const numOfChannels = audioBuffer.numberOfChannels;
@@ -85,14 +76,19 @@ function convertToWav(audioBuffer) {
   writeString(view, 36, 'data');
   view.setUint32(40, length, true);
 
-  const data = new Float32Array(audioBuffer.getChannelData(0));
-  for (let i = 0; i < data.length; i++) {
-    const multiplier = Math.min(1, Math.max(-1, data[i]));
-    view.setInt16(44 + i * 2, multiplier < 0 ? multiplier * 0x8000 : multiplier * 0x7FFF, true);
+  const channelData = new Float32Array(audioBuffer.length * numOfChannels);
+  for (let channel = 0; channel < numOfChannels; channel++) {
+    const data = audioBuffer.getChannelData(channel);
+    for (let i = 0; i < data.length; i++) {
+      channelData[i * numOfChannels + channel] = data[i];
+    }
+  }
+
+  for (let i = 0; i < channelData.length; i++) {
+    const multiplier = Math.min(1, Math.max(-1, channelData[i]));
+    view.setInt16(44 + i * 2, multiplier <     view.setInt16(44 + i * 2, multiplier < 0 ? multiplier * 0x8000 : multiplier * 0x7FFF, true);
   }
 
   return new Blob([view], { type: 'audio/wav' });
 }
-
-
 
