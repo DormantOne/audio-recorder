@@ -57,14 +57,6 @@ stopButton.addEventListener('click', () => {
   stopButton.disabled = true;
 });
 
-downloadButton.addEventListener('click', () => {
-  const audioBlob = new Blob(recordedChunks, { type: 'audio/webm' });
-  const audioURL = URL.createObjectURL(audioBlob);
-  const link = document.createElement('a');
-  link.href = audioURL;
-  link.download = `audio-${new Date().toISOString()}.webm`;
-  link.click();
-});
 
 function convertToWav(audioBuffer) {
   const numOfChannels = audioBuffer.numberOfChannels;
