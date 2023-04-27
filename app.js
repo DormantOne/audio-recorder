@@ -86,11 +86,6 @@ function convertToWav(audioBuffer) {
   }
 
   for (let i = 0; i < channelData.length; i++) {
-    const multiplier = Math.min(1, Math.max(-1, channelData
-
-                                            
-                                            
-                                              for (let i = 0; i < channelData.length; i++) {
     const multiplier = Math.min(1, Math.max(-1, channelData[i]));
     view.setInt16(44 + i * 2, multiplier < 0 ? multiplier * 0x8000 : multiplier * 0x7FFF, true);
   }
