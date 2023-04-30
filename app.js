@@ -2,6 +2,7 @@ const recordButton = document.getElementById('recordButton');
 const stopButton = document.getElementById('stopButton');
 const audioPlayer = document.getElementById('audioPlayer');
 const downloadButton = document.getElementById('downloadButton');
+const patientNameInput = document.getElementById('patientName');
 
 let mediaRecorder;
 let recordedChunks = [];
@@ -30,8 +31,11 @@ recordButton.addEventListener('click', () => {
           .then(audioBuffer => {
             const wavBlob = convertToWav(audioBuffer);
             const wavURL = URL.createObjectURL(wavBlob);
+            const patientName = patientNameInput.value.trim() || 'Unnamed';
+            const timestamp = new Date().toISOString().replace(/[-:.]/g, '');
+            const filename = `${patientName}_${timestamp}.wav`;
             downloadButton.href = wavURL;
-            downloadButton.download = `audio-${new Date().toISOString()}.wav`;
+            downloadButton.download = filename;
             downloadButton.style.display = 'inline';
           });
 
