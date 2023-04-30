@@ -24,6 +24,10 @@ recordButton.addEventListener('click', () => {
         const audioURL = URL.createObjectURL(audioBlob);
         audioPlayer.src = audioURL;
 
+        const patientName = patientNameInput.value.trim() || 'Unnamed';
+        const timestamp = new Date().toISOString().replace(/[-:.]/g, '');
+        const filename = `${patientName}_${timestamp}.wav`;
+
         const audioContext = new AudioContext();
         fetch(audioURL)
           .then(response => response.arrayBuffer())
@@ -31,9 +35,6 @@ recordButton.addEventListener('click', () => {
           .then(audioBuffer => {
             const wavBlob = convertToWav(audioBuffer);
             const wavURL = URL.createObjectURL(wavBlob);
-            const patientName = patientNameInput.value.trim() || 'Unnamed';
-            const timestamp = new Date().toISOString().replace(/[-:.]/g, '');
-            const filename = `${patientName}_${timestamp}.wav`;
             downloadButton.href = wavURL;
             downloadButton.download = filename;
             downloadButton.style.display = 'inline';
