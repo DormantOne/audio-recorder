@@ -3,25 +3,14 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Audio Recorder Test</title>
+    <title>Audio Recorder</title>
 </head>
 <body>
     <h1>Audio Recorder</h1>
-    <h2>Recording Options</h2>
-    <div>
-        <label for="patientName">Patient Name:</label>
-        <input type="text" id="patientName" name="patientName">
-    </div>
-    <div>
-        <button id="recordButton">Record</button>
-        <button id="stopButton" disabled>Stop</button>
-    </div>
-    <div>
-        <button id="downloadButton" disabled>Download</button>
-        <audio id="audioPlayer" controls></audio>
-        <a id="downloadLink" download style="display: none;"></a>
-    </div>
+    <button id="recordButton">Record</button>
+    <button id="stopButton" disabled>Stop</button>
+    <audio id="audioPlayer" controls></audio>
+    <a id="downloadButton" download style="display: none;">Download</a>
     <script src="app.js"></script>
 </body>
 </html>
-
