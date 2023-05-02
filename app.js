@@ -62,10 +62,9 @@ stopButton.addEventListener('click', async () => {
   downloadButton.download = filename;
 
   downloadButton.style.display = 'inline';
-    });
 
   recordedBlobs = [];
-  downloadButton.disabled = false;
+});
 
 
 pauseButton.addEventListener('click', () => {
