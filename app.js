@@ -37,13 +37,12 @@ recordButton.addEventListener('click', () => {
   pauseButton.textContent = 'Pause';
 });
 
-stopButton.addEventListener('click', () => {
+stopButton.addEventListener('click', async () => {
   mediaRecorder.stop();
   stream.getTracks().forEach(track => track.stop());
   recordButton.disabled = false;
   stopButton.disabled = true;
   pauseButton.disabled = true;
-
 
   const audioBlob = new Blob(recordedBlobs, { type: 'audio/webm' });
   const audioURL = URL.createObjectURL(audioBlob);
@@ -54,19 +53,20 @@ stopButton.addEventListener('click', () => {
   const filename = `${patientName}_${timestamp}.wav`;
 
   const audioContext = new AudioContext();
-  fetch(audioURL)
-    .then(response => response.arrayBuffer())
-    .then(data => audioContext.decodeAudioData(data))
-    .then(audioBuffer => {
-      const wavBlob = convertToWav(audioBuffer);
-      const wavURL = URL.createObjectURL(wavBlob);
-      downloadButton.href = wavURL;
-      downloadButton.download = filename;
-      downloadButton.style.display = 'inline';
+  const response = await fetch(audioURL);
+  const data = await response.arrayBuffer();
+  const audioBuffer = await audioContext.decodeAudioData(data);
+  const wavBlob = convertToWav(audioBuffer);
+  const wavURL = URL.createObjectURL(wavBlob);
+  downloadButton.href = wavURL;
+  downloadButton.download = filename;
+
+  downloadButton.style.display = 'inline';
     });
 
   recordedBlobs = [];
   downloadButton.disabled = false;
+
 });
 
 pauseButton.addEventListener('click', () => {
