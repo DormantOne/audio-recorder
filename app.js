@@ -9,6 +9,7 @@ const status = document.getElementById('status');
 let mediaRecorder;
 let recordedBlobs = [];
 let stream;
+let wakeLock = null;
 
 function formatTimestamp(date) {
   const year = date.getFullYear();
@@ -76,6 +77,11 @@ recordButton.addEventListener('click', () => {
   status.textContent = 'Recording';
   status.style.color = 'red';
   status.classList.add('blinking');
+  try {
+    wakeLock = await navigator.wakeLock.request('screen');
+  } catch (error) {
+    console.error('Error requesting wake lock:', error);
+  }
 });
 
 stopButton.addEventListener('click', () => {
@@ -87,6 +93,10 @@ stopButton.addEventListener('click', () => {
   status.textContent = 'Stopped';
   status.style.color = 'gray';
   status.classList.remove('blinking');
+    if (wakeLock) {
+    wakeLock.release();
+    wakeLock = null;
+  }
 });
 
 
