@@ -7,6 +7,7 @@ const patientNameInput = document.getElementById('patientName');
 
 let mediaRecorder;
 let recordedBlobs = [];
+let stream;
 
 function formatTimestamp(date) {
   const year = date.getFullYear();
@@ -19,30 +20,30 @@ function formatTimestamp(date) {
   return `${year}-${month}-${day}_TIME${hours}-${minutes}-${seconds}`;
 }
 
-recordButton.addEventListener('click', () => {
-  navigator.mediaDevices.getUserMedia({ audio: true })
-    .then(stream => {
-      mediaRecorder = new MediaRecorder(stream);
-      mediaRecorder.start();
-      recordButton.disabled = true;
-      stopButton.disabled = false;
-      pauseButton.disabled = false;
-      pauseButton.textContent = 'Pause';
+async function startRecording() {
+  stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+  mediaRecorder = new MediaRecorder(stream);
+  mediaRecorder.start();
+  mediaRecorder.addEventListener('dataavailable', event => {
+    recordedBlobs.push(event.data);
+  });
+}
 
-      mediaRecorder.addEventListener('dataavailable', event => {
-        recordedBlobs.push(event.data);
-      });
-    })
-    .catch(error => {
-      console.error('Error accessing audio:', error);
-    });
+recordButton.addEventListener('click', () => {
+  startRecording();
+  recordButton.disabled = true;
+  stopButton.disabled = false;
+  pauseButton.disabled = false;
+  pauseButton.textContent = 'Pause';
 });
 
 stopButton.addEventListener('click', () => {
   mediaRecorder.stop();
+  stream.getTracks().forEach(track => track.stop());
   recordButton.disabled = false;
   stopButton.disabled = true;
   pauseButton.disabled = true;
+
 
   const audioBlob = new Blob(recordedBlobs, { type: 'audio/webm' });
   const audioURL = URL.createObjectURL(audioBlob);
@@ -70,14 +71,13 @@ stopButton.addEventListener('click', () => {
 
 pauseButton.addEventListener('click', () => {
   if (mediaRecorder.state === 'recording') {
-    mediaRecorder.stop();
+    mediaRecorder.pause();
     pauseButton.textContent = 'Resume';
-  } else {
-    mediaRecorder.start();
+  } else if (mediaRecorder.state === 'paused') {
+    mediaRecorder.resume();
     pauseButton.textContent = 'Pause';
   }
 });
-
 
 function convertToWav(audioBuffer) {
   const numOfChannels = audioBuffer.numberOfChannels;
