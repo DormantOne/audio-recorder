@@ -67,8 +67,12 @@ async function startRecording() {
   }
 }
 
+
+
+
+
 recordButton.addEventListener('click', async () => {
-  startRecording();
+  await startRecording();
   recordButton.disabled = true;
   stopButton.disabled = false;
   pauseButton.disabled = false;
@@ -82,6 +86,7 @@ recordButton.addEventListener('click', async () => {
     console.error('Error requesting wake lock:', error);
   }
 });
+
 
 stopButton.addEventListener('click', () => {
   mediaRecorder.stop();
