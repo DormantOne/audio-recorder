@@ -67,7 +67,6 @@ stopButton.addEventListener('click', async () => {
   recordedBlobs = [];
   downloadButton.disabled = false;
 
-});
 
 pauseButton.addEventListener('click', () => {
   if (mediaRecorder.state === 'recording') {
