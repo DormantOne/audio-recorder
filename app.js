@@ -38,32 +38,36 @@ recordButton.addEventListener('click', () => {
 });
 
 stopButton.addEventListener('click', async () => {
-  mediaRecorder.stop();
-  stream.getTracks().forEach(track => track.stop());
-  recordButton.disabled = false;
-  stopButton.disabled = true;
-  pauseButton.disabled = true;
+  try {
+    mediaRecorder.stop();
+    stream.getTracks().forEach(track => track.stop());
+    recordButton.disabled = false;
+    stopButton.disabled = true;
+    pauseButton.disabled = true;
 
-  const audioBlob = new Blob(recordedBlobs, { type: 'audio/webm' });
-  const audioURL = URL.createObjectURL(audioBlob);
-  audioPlayer.src = audioURL;
+    const audioBlob = new Blob(recordedBlobs, { type: 'audio/webm' });
+    const audioURL = URL.createObjectURL(audioBlob);
+    audioPlayer.src = audioURL;
 
-  const patientName = patientNameInput.value.trim() || 'Unnamed';
-  const timestamp = formatTimestamp(new Date());
-  const filename = `${patientName}_${timestamp}.wav`;
+    const patientName = patientNameInput.value.trim() || 'Unnamed';
+    const timestamp = formatTimestamp(new Date());
+    const filename = `${patientName}_${timestamp}.wav`;
 
-  const audioContext = new AudioContext();
-  const response = await fetch(audioURL);
-  const data = await response.arrayBuffer();
-  const audioBuffer = await audioContext.decodeAudioData(data);
-  const wavBlob = convertToWav(audioBuffer);
-  const wavURL = URL.createObjectURL(wavBlob);
-  downloadButton.href = wavURL;
-  downloadButton.download = filename;
+    const audioContext = new AudioContext();
+    const response = await fetch(audioURL);
+    const data = await response.arrayBuffer();
+    const audioBuffer = await audioContext.decodeAudioData(data);
+    const wavBlob = convertToWav(audioBuffer);
+    const wavURL = URL.createObjectURL(wavBlob);
+    downloadButton.href = wavURL;
+    downloadButton.download = filename;
 
-  downloadButton.style.display = 'inline';
+    downloadButton.style.display = 'inline';
 
-  recordedBlobs = [];
+    recordedBlobs = [];
+  } catch (error) {
+    console.error('Error in stopButton event listener:', error);
+  }
 });
 
 
