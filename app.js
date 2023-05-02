@@ -22,35 +22,50 @@ function formatTimestamp(date) {
 }
 
 async function startRecording() {
-  stream = await navigator.mediaDevices.getUserMedia({ audio: true });
-  mediaRecorder = new MediaRecorder(stream);
-  mediaRecorder.start();
-  mediaRecorder.addEventListener('dataavailable', event => {
-    recordedBlobs.push(event.data);
-  });
-  mediaRecorder.addEventListener('stop', async () => {
-    const audioBlob = new Blob(recordedBlobs, { type: 'audio/webm' });
-    const audioURL = URL.createObjectURL(audioBlob);
-    audioPlayer.src = audioURL;
+  try {
+    stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+    mediaRecorder = new MediaRecorder(stream);
+    mediaRecorder.start();
+    mediaRecorder.addEventListener('dataavailable', event => {
+      recordedBlobs.push(event.data);
+    });
+    mediaRecorder.addEventListener('stop', async () => {
+      const audioBlob = new Blob(recordedBlobs, { type: 'audio/webm' });
+      const audioURL = URL.createObjectURL(audioBlob);
+      audioPlayer.src = audioURL;
 
-    const patientName = patientNameInput.value.trim() || 'Unnamed';
-    const timestamp = formatTimestamp(new Date());
-    const filename = `${patientName}_${timestamp}.wav`;
+      const patientName = patientNameInput.value.trim() || 'Unnamed';
+      const timestamp = formatTimestamp(new Date());
+      const filename = `${patientName}_${timestamp}.wav`;
 
-    const audioContext = new AudioContext();
-    const response = await fetch(audioURL);
-    const data = await response.arrayBuffer();
-    const audioBuffer = await audioContext.decodeAudioData(data);
-    const wavBlob = convertToWav(audioBuffer);
-    const wavURL = URL.createObjectURL(wavBlob);
-    downloadButton.href = wavURL;
-    downloadButton.download = filename;
+      const audioContext = new AudioContext();
+      const response = await fetch(audioURL);
+      const data = await response.arrayBuffer();
+      const audioBuffer = await audioContext.decodeAudioData(data);
+      const wavBlob = convertToWav(audioBuffer);
+      const wavURL = URL.createObjectURL(wavBlob);
+      downloadButton.href = wavURL;
+      downloadButton.download = filename;
 
-    downloadButton.style.display = 'inline';
+      downloadButton.style.display = 'inline';
 
-    recordedBlobs = [];
-  });
+      recordedBlobs = [];
+
+      status.textContent = 'Stopped';
+      status.style.color = 'gray';
+      status.classList.remove('blinking');
+    });
+
+    status.textContent = 'Recording';
+    status.style.color = 'red';
+    status.classList.add('blinking');
+  } catch (error) {
+    console.error('Error starting recording:', error);
+    status.textContent = 'Error';
+    status.style.color = 'red';
+  }
 }
+
 
 recordButton.addEventListener('click', () => {
   startRecording();
