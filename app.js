@@ -22,7 +22,7 @@ function formatTimestamp(date) {
 
 async function startRecording() {
   stream = await navigator.mediaDevices.getUserMedia({ audio: true });
-  mediaRecorder = new MediaRecorder(stream);
+  mediaRecorder = new MediaRecorder(stream, { mimeType: 'audio/ogg; codecs=opus' });
   mediaRecorder.start();
   mediaRecorder.addEventListener('dataavailable', event => {
     recordedBlobs.push(event.data);
@@ -44,7 +44,7 @@ stopButton.addEventListener('click', async () => {
   stopButton.disabled = true;
   pauseButton.disabled = true;
 
-  const audioBlob = new Blob(recordedBlobs, { type: 'audio/webm' });
+  const audioBlob = new Blob(recordedBlobs, { type: 'audio/ogg; codecs=opus' });
   const audioURL = URL.createObjectURL(audioBlob);
   audioPlayer.src = audioURL;
 
