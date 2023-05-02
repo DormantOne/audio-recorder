@@ -1,4 +1,5 @@
 const recordButton = document.getElementById('recordButton');
+const pauseButton = document.getElementById('pauseButton'); // Add a reference to the pause button
 const stopButton = document.getElementById('stopButton');
 const audioPlayer = document.getElementById('audioPlayer');
 const downloadButton = document.getElementById('downloadButton');
@@ -65,7 +66,16 @@ stopButton.addEventListener('click', () => {
   recordButton.disabled = false;
   stopButton.disabled = true;
 });
-
+// Add an event listener for the pause button
+pauseButton.addEventListener('click', () => {
+  if (mediaRecorder.state === 'recording') {
+    mediaRecorder.pause();
+    pauseButton.textContent = 'Resume';
+  } else if (mediaRecorder.state === 'paused') {
+    mediaRecorder.resume();
+    pauseButton.textContent = 'Pause';
+  }
+});
 function convertToWav(audioBuffer) {
   const numOfChannels = audioBuffer.numberOfChannels;
   const sampleRate = audioBuffer.sampleRate;
