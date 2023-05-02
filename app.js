@@ -37,25 +37,27 @@ recordButton.addEventListener('click', () => {
   pauseButton.textContent = 'Pause';
 });
 
-stopButton.addEventListener('click', () => {
-  mediaRecorder.addEventListener('stop', async () => {
-    stream.getTracks().forEach(track => track.stop());
-    recordButton.disabled = false;
-    stopButton.disabled = true;
-    pauseButton.disabled = true;
+stopButton.addEventListener('click', async () => {
+  mediaRecorder.stop();
+  stream.getTracks().forEach(track => track.stop());
+  recordButton.disabled = false;
+  stopButton.disabled = true;
+  pauseButton.disabled = true;
 
-    const audioBlob = new Blob(recordedBlobs, { type: 'audio/webm' });
-    const audioURL = URL.createObjectURL(audioBlob);
-    audioPlayer.src = audioURL;
+  const audioBlob = new Blob(recordedBlobs, { type: 'audio/webm' });
+  const audioURL = URL.createObjectURL(audioBlob);
+  audioPlayer.src = audioURL;
 
-    const patientName = patientNameInput.value.trim() || 'Unnamed';
-    const timestamp = formatTimestamp(new Date());
-    const filename = `${patientName}_${timestamp}.wav`;
+  const patientName = patientNameInput.value.trim() || 'Unnamed';
+  const timestamp = formatTimestamp(new Date());
+  const filename = `${patientName}_${timestamp}.wav`;
 
-    const audioContext = new AudioContext();
-    const response = await fetch(audioURL);
-    const data = await response.arrayBuffer();
-    const audioBuffer = await audioContext.decodeAudioData(data);
+  const audioContext = new AudioContext();
+  const response = await fetch(audioURL);
+  const data = await response.arrayBuffer();
+
+  // Use a Promise to handle the async nature of decodeAudioData
+  audioContext.decodeAudioData(data).then(async (audioBuffer) => {
     const wavBlob = convertToWav(audioBuffer);
     const wavURL = URL.createObjectURL(wavBlob);
     downloadButton.href = wavURL;
@@ -64,10 +66,11 @@ stopButton.addEventListener('click', () => {
     downloadButton.style.display = 'inline';
 
     recordedBlobs = [];
+  }).catch((error) => {
+    console.error('Error decoding audio data:', error);
   });
-
-  mediaRecorder.stop();
 });
+
 
 
 
