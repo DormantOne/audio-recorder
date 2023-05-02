@@ -95,11 +95,18 @@ pauseButton.addEventListener('click', () => {
   if (mediaRecorder.state === 'recording') {
     mediaRecorder.pause();
     pauseButton.textContent = 'Resume';
+    status.textContent = 'Paused';
+    status.style.color = 'gray';
+    status.classList.remove('blinking');
   } else if (mediaRecorder.state === 'paused') {
     mediaRecorder.resume();
     pauseButton.textContent = 'Pause';
+    status.textContent = 'Recording';
+    status.style.color = 'red';
+    status.classList.add('blinking');
   }
 });
+
 
 function convertToWav(audioBuffer) {
   const numOfChannels = audioBuffer.numberOfChannels;
