@@ -4,6 +4,17 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Audio Recorder</title>
+    <style>
+  .blinking {
+    animation: blinkingText 1s infinite;
+  }
+
+  @keyframes blinkingText {
+    0% { opacity: 1; }
+    50% { opacity: 0; }
+    100% { opacity: 1; }
+  }
+</style>
 </head>
 <body>
     <h1>Audio Recorder</h1>
@@ -14,8 +25,9 @@
         <button type="button" id="pauseButton" disabled>Pause</button>
         <button type="button" id="stopButton" disabled>Stop</button>
     </form>
-    <audio id="audioPlayer" controls></audio>
+   <audio id="audioPlayer" controls></audio>
     <a id="downloadButton" download style="display: none;">Download</a>
+    <p id="status" style="color: gray;">Stopped</p>
     <script src="app.js"></script>
 </body>
 </html>
