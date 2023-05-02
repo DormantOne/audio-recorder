@@ -4,6 +4,7 @@ const stopButton = document.getElementById('stopButton');
 const audioPlayer = document.getElementById('audioPlayer');
 const downloadButton = document.getElementById('downloadButton');
 const patientNameInput = document.getElementById('patientName');
+const status = document.getElementById('status');
 
 let mediaRecorder;
 let recordedBlobs = [];
@@ -57,6 +58,9 @@ recordButton.addEventListener('click', () => {
   stopButton.disabled = false;
   pauseButton.disabled = false;
   pauseButton.textContent = 'Pause';
+  status.textContent = 'Recording';
+  status.style.color = 'red';
+  status.classList.add('blinking');
 });
 
 stopButton.addEventListener('click', () => {
@@ -65,8 +69,10 @@ stopButton.addEventListener('click', () => {
   recordButton.disabled = false;
   stopButton.disabled = true;
   pauseButton.disabled = true;
+  status.textContent = 'Stopped';
+  status.style.color = 'gray';
+  status.classList.remove('blinking');
 });
-
 
 
 
