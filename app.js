@@ -1,12 +1,12 @@
 const recordButton = document.getElementById('recordButton');
-const pauseButton = document.getElementById('pauseButton'); // Add a reference to the pause button
+const pauseButton = document.getElementById('pauseButton');
 const stopButton = document.getElementById('stopButton');
 const audioPlayer = document.getElementById('audioPlayer');
 const downloadButton = document.getElementById('downloadButton');
 const patientNameInput = document.getElementById('patientName');
 
 let mediaRecorder;
-let recordedChunks = [];
+let recordedBlobs = [];
 
 function formatTimestamp(date) {
   const year = date.getFullYear();
@@ -26,34 +26,11 @@ recordButton.addEventListener('click', () => {
       mediaRecorder.start();
       recordButton.disabled = true;
       stopButton.disabled = false;
+      pauseButton.disabled = false;
+      pauseButton.textContent = 'Pause';
 
       mediaRecorder.addEventListener('dataavailable', event => {
-        recordedChunks.push(event.data);
-      });
-
-      mediaRecorder.addEventListener('stop', () => {
-        const audioBlob = new Blob(recordedChunks, { type: 'audio/webm' });
-        const audioURL = URL.createObjectURL(audioBlob);
-        audioPlayer.src = audioURL;
-
-        const patientName = patientNameInput.value.trim() || 'Unnamed';
-        const timestamp = formatTimestamp(new Date());
-        const filename = `${patientName}_${timestamp}.wav`;
-
-        const audioContext = new AudioContext();
-        fetch(audioURL)
-          .then(response => response.arrayBuffer())
-          .then(data => audioContext.decodeAudioData(data))
-          .then(audioBuffer => {
-            const wavBlob = convertToWav(audioBuffer);
-            const wavURL = URL.createObjectURL(wavBlob);
-            downloadButton.href = wavURL;
-            downloadButton.download = filename;
-            downloadButton.style.display = 'inline';
-          });
-
-        recordedChunks = [];
-        downloadButton.disabled = false;
+        recordedBlobs.push(event.data);
       });
     })
     .catch(error => {
@@ -65,17 +42,43 @@ stopButton.addEventListener('click', () => {
   mediaRecorder.stop();
   recordButton.disabled = false;
   stopButton.disabled = true;
+  pauseButton.disabled = true;
+
+  const audioBlob = new Blob(recordedBlobs, { type: 'audio/webm' });
+  const audioURL = URL.createObjectURL(audioBlob);
+  audioPlayer.src = audioURL;
+
+  const patientName = patientNameInput.value.trim() || 'Unnamed';
+  const timestamp = formatTimestamp(new Date());
+  const filename = `${patientName}_${timestamp}.wav`;
+
+  const audioContext = new AudioContext();
+  fetch(audioURL)
+    .then(response => response.arrayBuffer())
+    .then(data => audioContext.decodeAudioData(data))
+    .then(audioBuffer => {
+      const wavBlob = convertToWav(audioBuffer);
+      const wavURL = URL.createObjectURL(wavBlob);
+      downloadButton.href = wavURL;
+      downloadButton.download = filename;
+      downloadButton.style.display = 'inline';
+    });
+
+  recordedBlobs = [];
+  downloadButton.disabled = false;
 });
-// Add an event listener for the pause button
+
 pauseButton.addEventListener('click', () => {
   if (mediaRecorder.state === 'recording') {
-    mediaRecorder.pause();
+    mediaRecorder.stop();
     pauseButton.textContent = 'Resume';
-  } else if (mediaRecorder.state === 'paused') {
-    mediaRecorder.resume();
+  } else {
+    mediaRecorder.start();
     pauseButton.textContent = 'Pause';
   }
 });
+
+
 function convertToWav(audioBuffer) {
   const numOfChannels = audioBuffer.numberOfChannels;
   const sampleRate = audioBuffer.sampleRate;
