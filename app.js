@@ -37,9 +37,8 @@ recordButton.addEventListener('click', () => {
   pauseButton.textContent = 'Pause';
 });
 
-stopButton.addEventListener('click', async () => {
-  try {
-    mediaRecorder.stop();
+stopButton.addEventListener('click', () => {
+  mediaRecorder.addEventListener('stop', async () => {
     stream.getTracks().forEach(track => track.stop());
     recordButton.disabled = false;
     stopButton.disabled = true;
@@ -65,10 +64,11 @@ stopButton.addEventListener('click', async () => {
     downloadButton.style.display = 'inline';
 
     recordedBlobs = [];
-  } catch (error) {
-    console.error('Error in stopButton event listener:', error);
-  }
+  });
+
+  mediaRecorder.stop();
 });
+
 
 
 pauseButton.addEventListener('click', () => {
