@@ -67,8 +67,7 @@ async function startRecording() {
   }
 }
 
-
-recordButton.addEventListener('click', () => {
+recordButton.addEventListener('click', async () => {
   startRecording();
   recordButton.disabled = true;
   stopButton.disabled = false;
